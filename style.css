@@ -1,0 +1,576 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 头部 */
+.header {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+/* 筛选区域 */
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(255,255,255,0.95);
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: #333;
+  min-width: 80px;
+}
+
+.filter-group.search-main input {
+  min-width: 350px;
+}
+
+.filter-group input,
+.filter-group select {
+  padding: 10px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  min-width: 180px;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-btn {
+  padding: 10px 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.clear-btn {
+  padding: 10px 30px;
+  background: linear-gradient(135deg, #636e72 0%, #2d3436 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(45, 52, 54, 0.4);
+}
+
+/* 主体内容 */
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+/* 地图区域 */
+.map-section {
+  background: rgba(255,255,255,0.95);
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.map-container {
+  position: relative;
+}
+
+.map-svg {
+  width: 100%;
+  height: 580px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #0a1628 0%, #1a237e 50%, #0d47a1 100%);
+  box-shadow: 
+    0 0 60px rgba(100, 200, 255, 0.15),
+    inset 0 0 40px rgba(0, 0, 0, 0.3);
+}
+
+.district {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.district:hover {
+  opacity: 1 !important;
+  transform-origin: center;
+  filter: drop-shadow(0 6px 15px rgba(100, 200, 255, 0.4)) !important;
+}
+
+.district-label {
+  font-size: 18px;
+  font-weight: 700;
+  fill: white;
+  text-anchor: middle;
+  pointer-events: none;
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(100, 200, 255, 0.5);
+  font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+}
+
+.legend-text {
+  font-size: 12px;
+  fill: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.price-hint {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(124, 58, 237, 0.2) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 
+    0 4px 20px rgba(0, 212, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* 详情面板 */
+.detail-section {
+  background: rgba(255,255,255,0.95);
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.tab-btn {
+  padding: 10px 25px;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab-btn.active {
+  color: #667eea;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tab-content {
+  flex: 1;
+}
+
+.school-type-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.type-btn {
+  padding: 8px 20px;
+  border: 2px solid #4ECDC4;
+  border-radius: 20px;
+  background: white;
+  color: #4ECDC4;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.type-btn:hover {
+  background: #4ECDC4;
+  color: white;
+}
+
+.type-btn.active {
+  background: #4ECDC4;
+  color: white;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.tab-panel h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+/* 列表容器 */
+.list-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.list-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.list-container::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 3px;
+}
+
+.list-container::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}
+
+/* 列表项 */
+.list-item {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.list-item:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+  border-left-color: #667eea;
+}
+
+.list-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.list-item-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.list-item-price {
+  font-weight: 600;
+  color: #e74c3c;
+}
+
+.list-item-address {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.list-item-meta {
+  font-size: 12px;
+  color: #999;
+  display: flex;
+  gap: 15px;
+}
+
+/* 高亮卡片 */
+.list-item.highlight-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-left-color: #fff !important;
+}
+
+.list-item.highlight-card .list-item-name,
+.list-item.highlight-card .list-item-address,
+.list-item.highlight-card .list-item-meta {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.list-item.highlight-card .list-item-price {
+  color: #ffeaa7;
+}
+
+/* 热门标签 */
+.hot-tag {
+  font-size: 12px;
+  color: #e74c3c;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+/* 学校类型标签 */
+.school-type {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.school-type.小学 {
+  background: #87CEEB;
+  color: #fff;
+}
+
+.school-type.初中 {
+  background: #98D8C8;
+  color: #fff;
+}
+
+.school-type.高中 {
+  background: #F7DC6F;
+  color: #333;
+}
+
+.school-type.高等学校 {
+  background: #DDA0DD;
+  color: #fff;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.empty-state p {
+  margin-bottom: 5px;
+}
+
+.empty-state .hint {
+  font-size: 13px;
+  color: #bbb;
+}
+
+/* 弹窗 */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.close-btn {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.modal-content h3 {
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.modal-body {
+  color: #666;
+}
+
+.modal-row {
+  display: flex;
+  padding: 12px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.modal-label {
+  min-width: 100px;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-value {
+  flex: 1;
+}
+
+.modal-highlight {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+/* 距离标签 */
+.distance-tag {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 学校类型标签 */
+.school-type {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 15px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.school-type.小学 {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.school-type.初中 {
+  background: #e0f7fa;
+  color: #006064;
+}
+
+.school-type.高中 {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.school-type.高等学校 {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
+/* 底部 */
+.footer {
+  text-align: center;
+  color: white;
+  margin-top: 30px;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-btn {
+    width: 100%;
+  }
+}

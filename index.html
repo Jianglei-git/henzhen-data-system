@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>深圳区域数据系统</title>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+  <div class="container">
+    <!-- 头部 -->
+    <header class="header">
+      <h1 class="title">深圳区域数据系统</h1>
+      <p class="subtitle">探索深圳各区房价、小区与学校分布</p>
+    </header>
+
+    <!-- 筛选区域 -->
+    <div class="filter-section">
+      <div class="filter-group search-main">
+        <label>小区名称:</label>
+        <input type="text" id="communityInput" placeholder="输入小区名称，如：华润深圳湾悦府">
+      </div>
+      <button class="search-btn" onclick="searchNearby()">查询</button>
+      <button class="clear-btn" onclick="clearSearch()">清除</button>
+    </div>
+
+    <!-- 主体内容 -->
+    <div class="main-content">
+      <!-- 左侧：区域地图 -->
+      <div class="map-section">
+        <h2 class="section-title">深圳区域地图</h2>
+        <div class="map-container">
+          <svg viewBox="0 0 900 700" class="map-svg">
+            <!-- 科技感渐变定义 -->
+            <defs>
+              <linearGradient id="priceGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#00D4FF" />
+                <stop offset="50%" stop-color="#7C3AED" />
+                <stop offset="100%" stop-color="#FF0080" />
+              </linearGradient>
+              
+              <!-- 科技感发光滤镜 -->
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              
+              <!-- 边框发光滤镜 -->
+              <filter id="edgeGlow" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur stdDeviation="2" result="blur"/>
+                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+              </filter>
+              
+              <!-- 渐变填充 -->
+              <linearGradient id="nanshanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#667EEA"/>
+                <stop offset="100%" stop-color="#764BA2"/>
+              </linearGradient>
+              <linearGradient id="baoanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#11998E"/>
+                <stop offset="100%" stop-color="#38EF7D"/>
+              </linearGradient>
+              <linearGradient id="futianGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#4FACFE"/>
+                <stop offset="100%" stop-color="#00F2FE"/>
+              </linearGradient>
+              <linearGradient id="luohuGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#43E97B"/>
+                <stop offset="100%" stop-color="#38F9D7"/>
+              </linearGradient>
+              <linearGradient id="yantianGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FA709A"/>
+                <stop offset="100%" stop-color="#FEE140"/>
+              </linearGradient>
+              <linearGradient id="longhuaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#A18CD1"/>
+                <stop offset="100%" stop-color="#FBC2EB"/>
+              </linearGradient>
+              <linearGradient id="guangmingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FF9A9E"/>
+                <stop offset="100%" stop-color="#FECFEF"/>
+              </linearGradient>
+              <linearGradient id="longgangGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFECD2"/>
+                <stop offset="100%" stop-color="#FCB69F"/>
+              </linearGradient>
+              <linearGradient id="pingshanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FF6B6B"/>
+                <stop offset="100%" stop-color="#FFE66D"/>
+              </linearGradient>
+              <linearGradient id="dapengGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#4ECDC4"/>
+                <stop offset="100%" stop-color="#44A08D"/>
+              </linearGradient>
+              <linearGradient id="shenshanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FF8008"/>
+                <stop offset="100%" stop-color="#FFC837"/>
+              </linearGradient>
+            </defs>
+            
+            <!-- 背景网格 -->
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(100, 200, 255, 0.1)" stroke-width="0.5"/>
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#grid)"/>
+            
+            <!-- 背景光晕 -->
+            <ellipse cx="400" cy="300" rx="200" ry="150" fill="rgba(64, 128, 255, 0.1)" filter="url(#glow)"/>
+            <ellipse cx="500" cy="350" rx="150" ry="100" fill="rgba(128, 64, 255, 0.08)" filter="url(#glow)"/>
+            
+            <!-- 各区路径 -->
+            <g class="districts" onclick="handleDistrictClick(event)">
+              <!-- 南山区 -->
+              <path class="district" data-district="南山区" d="M100,200 L100,320 L220,360 L260,280 L260,220 L200,180 Z" 
+                    fill="url(#nanshanGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>南山区 - 均价: ¥91,600/㎡</title>
+              </path>
+              <text x="170" y="265" class="district-label">南山区</text>
+              
+              <!-- 宝安区 -->
+              <path class="district" data-district="宝安区" d="M50,280 L50,400 L150,440 L200,380 L220,360 L100,320 L100,280 Z" 
+                    fill="url(#baoanGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>宝安区 - 均价: ¥57,500/㎡</title>
+              </path>
+              <text x="115" y="360" class="district-label">宝安区</text>
+              
+              <!-- 福田区 -->
+              <path class="district" data-district="福田区" d="M260,220 L360,200 L380,280 L340,340 L260,280 Z" 
+                    fill="url(#futianGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>福田区 - 均价: ¥78,600/㎡</title>
+              </path>
+              <text x="310" y="260" class="district-label">福田区</text>
+              
+              <!-- 罗湖区 -->
+              <path class="district" data-district="罗湖区" d="M360,200 L460,190 L480,270 L440,330 L380,280 Z" 
+                    fill="url(#luohuGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>罗湖区 - 均价: ¥66,750/㎡</title>
+              </path>
+              <text x="420" y="245" class="district-label">罗湖区</text>
+              
+              <!-- 盐田区 -->
+              <path class="district" data-district="盐田区" d="M460,190 L540,180 L550,260 L510,320 L480,270 Z" 
+                    fill="url(#yantianGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>盐田区 - 均价: ¥71,500/㎡</title>
+              </path>
+              <text x="505" y="230" class="district-label">盐田区</text>
+              
+              <!-- 龙华区 -->
+              <path class="district" data-district="龙华区" d="M200,380 L260,340 L340,340 L360,400 L280,460 L200,440 Z" 
+                    fill="url(#longhuaGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>龙华区 - 均价: ¥61,000/㎡</title>
+              </path>
+              <text x="280" y="405" class="district-label">龙华区</text>
+              
+              <!-- 光明区 -->
+              <path class="district" data-district="光明区" d="M150,440 L200,440 L200,520 L100,560 L60,480 L100,460 Z" 
+                    fill="url(#guangmingGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>光明区 - 均价: ¥40,000/㎡</title>
+              </path>
+              <text x="145" y="505" class="district-label">光明区</text>
+              
+              <!-- 龙岗区 -->
+              <path class="district" data-district="龙岗区" d="M340,340 L440,330 L510,320 L530,400 L450,460 L360,400 Z" 
+                    fill="url(#longgangGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>龙岗区 - 均价: ¥50,000/㎡</title>
+              </path>
+              <text x="430" y="380" class="district-label">龙岗区</text>
+              
+              <!-- 坪山区 -->
+              <path class="district" data-district="坪山区" d="M450,460 L530,440 L590,480 L570,540 L500,540 L470,480 Z" 
+                    fill="url(#pingshanGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>坪山区 - 均价: ¥37,000/㎡</title>
+              </path>
+              <text x="520" y="500" class="district-label">坪山区</text>
+              
+              <!-- 大鹏新区 -->
+              <path class="district" data-district="大鹏新区" d="M540,180 L620,170 L660,250 L640,330 L590,350 L550,260 Z" 
+                    fill="url(#dapengGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>大鹏新区 - 均价: ¥35,000/㎡</title>
+              </path>
+              <text x="600" y="260" class="district-label">大鹏新区</text>
+              
+              <!-- 深汕特别合作区 -->
+              <path class="district" data-district="深汕特别合作区" d="M720,500 L780,480 L800,540 L760,580 L720,560 Z" 
+                    fill="url(#shenshanGrad)" opacity="0.85" stroke="rgba(255,255,255,0.8)" stroke-width="2" filter="url(#edgeGlow)">
+                <title>深汕特别合作区</title>
+              </path>
+              <text x="740" y="535" class="district-label">深汕合作区</text>
+            </g>
+            
+            <!-- 科技感装饰线条 -->
+            <path d="M80,150 Q150,130 200,150" fill="none" stroke="rgba(100, 200, 255, 0.3)" stroke-width="1" stroke-dasharray="8,4"/>
+            <path d="M600,130 Q650,110 700,140" fill="none" stroke="rgba(150, 100, 255, 0.3)" stroke-width="1" stroke-dasharray="8,4"/>
+            <path d="M300,580 Q350,600 400,580" fill="none" stroke="rgba(100, 200, 255, 0.2)" stroke-width="1" stroke-dasharray="6,3"/>
+            
+            <!-- 光点装饰 -->
+            <circle cx="180" cy="240" r="3" fill="#00D4FF" filter="url(#glow)" opacity="0.6">
+              <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="320" cy="280" r="2.5" fill="#FF0080" filter="url(#glow)" opacity="0.6">
+              <animate attributeName="opacity" values="0.4;1;0.4" dur="2.5s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="450" cy="350" r="2" fill="#7C3AED" filter="url(#glow)" opacity="0.6">
+              <animate attributeName="opacity" values="0.4;1;0.4" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="580" cy="280" r="2.5" fill="#00D4FF" filter="url(#glow)" opacity="0.6">
+              <animate attributeName="opacity" values="0.4;1;0.4" dur="2.2s" repeatCount="indefinite"/>
+            </circle>
+            
+            <!-- 图例 -->
+            <g class="legend">
+              <rect x="720" y="50" width="120" height="10" fill="url(#priceGradient)" rx="5"/>
+              <text x="720" y="75" class="legend-text">低价</text>
+              <text x="810" y="75" class="legend-text">高价</text>
+            </g>
+            
+            <!-- 海岸线示意 -->
+            <path d="M200,160 Q280,140 360,160 Q440,140 520,160 Q600,140 680,180" 
+                  fill="none" stroke="#00D4FF" stroke-width="2" stroke-dasharray="6,4" opacity="0.6"/>
+            <text x="640" y="155" class="legend-text" fill="#00D4FF">🌊 海岸线</text>
+            
+            <!-- 深汕合作区连接线 -->
+            <path d="M590,480 L680,500 L720,500" fill="none" stroke="rgba(255, 136, 0, 0.4)" stroke-width="1.5" stroke-dasharray="4,4"/>
+            <text x="620" y="515" class="legend-text" fill="#FF8800" font-size="10">飞地</text>
+          </svg>
+          
+          <!-- 房价提示 -->
+          <div class="price-hint">
+            <span>点击区域查看详情</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：详情面板 -->
+      <div class="detail-section">
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('community')">小区列表</button>
+          <button class="tab-btn" onclick="switchTab('school')">学校列表</button>
+          <button class="tab-btn" onclick="switchTab('result')">查询结果</button>
+        </div>
+        
+        <div class="tab-content">
+          <!-- 小区列表 -->
+          <div id="communityTab" class="tab-panel active">
+            <h3 id="communityTitle">选择区域查看小区</h3>
+            <div id="communityList" class="list-container">
+              <div class="empty-state">
+                <div class="empty-icon">🏠</div>
+                <p>点击地图上的区域查看小区列表</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 学校列表 -->
+          <div id="schoolTab" class="tab-panel">
+            <h3 id="schoolTitle">学校列表</h3>
+            <div id="schoolTypeButtons" class="school-type-buttons">
+              <button class="type-btn active" onclick="filterSchoolType('小学')">🏫 小学</button>
+              <button class="type-btn" onclick="filterSchoolType('初中')">🏢 初中</button>
+              <button class="type-btn" onclick="filterSchoolType('高中')">🏛️ 高中</button>
+              <button class="type-btn" onclick="filterSchoolType('高等学校')">🎓 高等教育</button>
+            </div>
+            <div id="schoolList" class="list-container">
+              <!-- 学校列表将动态生成 -->
+            </div>
+          </div>
+          
+          <!-- 查询结果 -->
+          <div id="resultTab" class="tab-panel">
+            <h3 id="resultTitle">查询结果</h3>
+            <div id="resultContent" class="list-container">
+              <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <p>输入小区名称点击查询</p>
+                <p class="hint">查询附近的学校和小区</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部 -->
+    <footer class="footer">
+      <p>深圳区域数据系统 © 2024</p>
+    </footer>
+  </div>
+
+  <!-- 小区详情弹窗 -->
+  <div id="communityModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h3 id="modalTitle">小区详情</h3>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
